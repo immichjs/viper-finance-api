@@ -11,7 +11,7 @@ export class User {
   @Column({ length: 500, unique: true })
   email: string;
 
-  @Column({ length: 32 })
+  @Column()
   password: string;
 
   @Column('date', { name: 'created_at', default: new Date() })
