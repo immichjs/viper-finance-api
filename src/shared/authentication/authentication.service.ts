@@ -35,9 +35,9 @@ export class AuthenticationService {
     });
 
     try {
-      const savedUser = await this.userRepository.save(createdUser);
+      await this.userRepository.save(createdUser);
 
-      savedUser.password = undefined;
+      createdUser.password = undefined;
       const payload: IJwtPayload = { email };
 
       const token = await this.jwtService.sign({
@@ -45,7 +45,7 @@ export class AuthenticationService {
       });
 
       return {
-        ...savedUser,
+        ...createdUser,
         token,
       };
     } catch ({ code }) {
@@ -61,28 +61,32 @@ export class AuthenticationService {
     email,
     password,
   }: AuthCredentialsDto): Promise<IUserAuthentication> {
-    const findedUser = await this.userRepository.findOne({
-      where: { email },
-    });
-
-    const compareUserPassword = await bcrypt.compare(
-      password,
-      findedUser.password,
-    );
-
-    if (findedUser && compareUserPassword) {
-      findedUser.password = undefined;
-      const payload: IJwtPayload = { email };
-
-      const token = await this.jwtService.sign({
-        payload,
+    try {
+      const findedUser = await this.userRepository.findOne({
+        where: { email },
       });
 
-      return { ...findedUser, token };
-    } else {
-      throw new UnauthorizedException(
-        'Por favor, verifique as suas credenciais de acesso.',
+      const compareUserPassword = await bcrypt.compare(
+        password,
+        findedUser.password,
       );
+
+      if (findedUser && compareUserPassword) {
+        findedUser.password = undefined;
+        const payload: IJwtPayload = { email };
+
+        const token = await this.jwtService.sign({
+          payload,
+        });
+
+        return { ...findedUser, token };
+      } else {
+        throw new UnauthorizedException(
+          'Por favor, verifique as suas credenciais de acesso.',
+        );
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 }

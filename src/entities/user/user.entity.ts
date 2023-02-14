@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UpdateDateColumn } from 'typeorm/decorator/columns/UpdateDateColumn';
+import { Account } from '../account/account.entity';
+import { Card } from '../card/card.entity';
 
 @Entity('users')
 export class User {
@@ -8,12 +11,24 @@ export class User {
   @Column({ length: 500 })
   name: string;
 
-  @Column({ length: 500, unique: true })
+  @Column({
+    length: 500,
+    unique: true,
+  })
   email: string;
 
   @Column()
   password: string;
 
-  @Column('date', { name: 'created_at', default: new Date() })
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @Column('timestamp', { name: 'created_at', default: new Date() })
   createdAt: Date;
+
+  @OneToMany(() => Account, (account) => account.user)
+  accounts: Account[];
+
+  @OneToMany(() => Card, (card) => card.user)
+  cards: Card[];
 }
