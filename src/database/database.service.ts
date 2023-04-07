@@ -1,5 +1,6 @@
 import { Account } from 'src/entities/account/account.entity';
 import { Card } from 'src/entities/card/card.entity';
+import { Transaction } from 'src/entities/transaction/transaction.entity';
 import { User } from 'src/entities/user/user.entity';
 import { DataSource } from 'typeorm';
 
@@ -14,7 +15,7 @@ export const databaseServices = [
         username: 'postgres',
         password: 'postgres',
         database: 'viper.finance',
-        entities: [User, Account, Card],
+        entities: [User, Account, Card, Transaction],
         synchronize: true,
       });
 

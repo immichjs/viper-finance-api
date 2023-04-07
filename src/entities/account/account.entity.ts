@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UpdateDateColumn } from 'typeorm/decorator/columns/UpdateDateColumn';
 import { ManyToOne } from 'typeorm/decorator/relations/ManyToOne';
+import { Transaction } from '../transaction/transaction.entity';
 import { User } from '../user/user.entity';
 
 @Entity('accounts')
@@ -22,4 +23,9 @@ export class Account {
 
   @ManyToOne(() => User, (user) => user.accounts)
   user: User;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.account, {
+    nullable: true,
+  })
+  transactions: Transaction[];
 }

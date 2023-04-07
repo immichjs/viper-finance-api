@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { AuthCredentialsDto } from 'src/entities/user/dto/auth-credentials.dto';
 import { CreateUserDto } from 'src/entities/user/dto/create-user.dto';
 import { IUserAuthentication } from 'src/interfaces/user-authentication.interface';
@@ -16,6 +16,7 @@ export class AuthController {
   }
 
   @Post('/signin')
+  @HttpCode(200)
   signIn(
     @Body() authCredencialsDto: AuthCredentialsDto,
   ): Promise<IUserAuthentication> {

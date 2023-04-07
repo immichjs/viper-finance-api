@@ -1,8 +1,8 @@
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -61,32 +61,28 @@ export class AuthenticationService {
     email,
     password,
   }: AuthCredentialsDto): Promise<IUserAuthentication> {
-    try {
-      const findedUser = await this.userRepository.findOne({
-        where: { email },
+    const findedUser = await this.userRepository.findOne({
+      where: { email },
+    });
+
+    const compareUserPassword = await bcrypt.compare(
+      password,
+      findedUser.password,
+    );
+
+    if (findedUser && compareUserPassword) {
+      findedUser.password = undefined;
+      const payload: IJwtPayload = { email };
+
+      const token = await this.jwtService.sign({
+        payload,
       });
 
-      const compareUserPassword = await bcrypt.compare(
-        password,
-        findedUser.password,
+      return { ...findedUser, token };
+    } else {
+      throw new BadRequestException(
+        'Por favor, verifique suas credenciais de acesso.',
       );
-
-      if (findedUser && compareUserPassword) {
-        findedUser.password = undefined;
-        const payload: IJwtPayload = { email };
-
-        const token = await this.jwtService.sign({
-          payload,
-        });
-
-        return { ...findedUser, token };
-      } else {
-        throw new UnauthorizedException(
-          'Por favor, verifique as suas credenciais de acesso.',
-        );
-      }
-    } catch (error) {
-      console.log(error);
     }
   }
 }
